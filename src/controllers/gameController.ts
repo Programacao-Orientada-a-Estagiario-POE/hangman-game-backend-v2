@@ -1,8 +1,7 @@
-import { Request, Response } from "express";
-import Game from "../entities/Game";
+import { Request, Response } from 'express';
+import Game from '../entities/Game';
 
 class GameController {
-  // show products
   async start(req: Request, res: Response) {
     const countGames = await Game.countDocuments();
     const rand = Math.floor(Math.random() * countGames);
@@ -14,7 +13,7 @@ class GameController {
 
     if (!startedGame) {
       return res.status(404).json({
-        message: "Game not found",
+        message: 'Game not found',
       });
     }
     return res.json({
@@ -32,24 +31,32 @@ class GameController {
   }
 
   async checkLetter(req: Request, res: Response) {
+    const getIndexesOfLettersByWord = (
+      word: string,
+      letterToVerify: string
+    ): Number[] => {
+      const indexesOfLetters: Array<number> = [];
+      word.split('').forEach((letter, index) => {
+        if (letter.toLowerCase() == letterToVerify.toLowerCase())
+          indexesOfLetters.push(index);
+      });
+
+      return indexesOfLetters;
+    };
+
     const { id, letter } = req.body;
     try {
       const game = await Game.findById(id);
 
       if (!game) {
         return res.status(404).json({
-          message: "Game not found",
+          message: 'Game not found',
         });
       }
-
-      const indexesOfLetters = this.getIndexesOfLettersByWord(
-        game.word,
-        letter
-      );
-      console.log(indexesOfLetters);
+      const indexesOfLetters = getIndexesOfLettersByWord(game.word, letter);
 
       if (!indexesOfLetters) {
-        return res.json({ message: "Letter not founded" });
+        return res.json({ message: 'Letter not founded' });
       }
       return res.json({ indexesOfLetters });
     } catch (error) {
@@ -57,18 +64,6 @@ class GameController {
       return res.status(404).json({ message: error.message });
     }
   }
-
-  private getIndexesOfLettersByWord(word: string, letterToVerify: string) {
-    const indexesOfLetters: Array<number> = [];
-    word.split("").forEach((letter, index) => {
-      if (letter.toLowerCase() == letterToVerify.toLowerCase())
-        indexesOfLetters.push(index);
-    });
-
-    return indexesOfLetters;
-  }
 }
 
-const gameController = new GameController();
-
-export default gameController;
+export default GameController;
