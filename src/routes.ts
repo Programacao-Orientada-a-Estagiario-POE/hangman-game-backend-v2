@@ -5,11 +5,7 @@ const routes = Router();
 const gameController = new GameController();
 
 routes.post('/checkletter', gameController.checkLetter);
-routes.get('/game-start', gameController.start);
+routes.get('/game', gameController.start);
 routes.post('/game', gameController.create);
-
-routes.get('/', (req, res) => {
-  res.send('Olá');
-});
 
 export default routes;
