@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import IGame from "../models/Game";
+import mongoose from 'mongoose';
+import IGame from '../models/Game';
 
 const gameSchema = new mongoose.Schema({
   theme: {
@@ -16,6 +16,6 @@ const gameSchema = new mongoose.Schema({
   },
 });
 
-const Game = mongoose.model<IGame>("game", gameSchema);
+const Game = mongoose.model<IGame>('game', gameSchema);
 
 export default Game;

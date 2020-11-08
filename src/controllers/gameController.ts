@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import Game from '../entities/Game';
 
+import UserService from '../services/UserService';
+
 class GameController {
   async start(req: Request, res: Response) {
     const countGames = await Game.countDocuments();
@@ -16,10 +18,12 @@ class GameController {
         message: 'Game not found',
       });
     }
+
     return res.json({
       id: startedGame._id,
       theme: startedGame.theme,
       quantityLetters: startedGame.word.length,
+      user_id: UserService.generateUserId(req),
     });
   }
 
