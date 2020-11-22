@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import Game from '../entities/Game';
 import GameInformation from '../entities/GameInformation';
 
+import UserService from '../services/UserService';
+
 class GameController {
   async start(req: Request, res: Response) {
     const countGames = await Game.countDocuments();
@@ -18,16 +20,20 @@ class GameController {
       });
     }
 
+<<<<<<< HEAD
     const gameInformation = await GameInformation.create({
       id_game: startedGame._id,
       lifes: 6,
     });
 
+=======
+>>>>>>> 028138428ee3843f11ddce9bc7d6c5b897444c2a
     return res.json({
       id: gameInformation._id,
       lifes: gameInformation.lifes,
       theme: startedGame.theme,
       quantityLetters: startedGame.word.length,
+      user_id: UserService.generateUserId(req),
     });
   }
 
