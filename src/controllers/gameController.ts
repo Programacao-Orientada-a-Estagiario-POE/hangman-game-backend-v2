@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Game from '../entities/Game';
+import GameInformation from '../entities/GameInformation';
 
 class GameController {
   async start(req: Request, res: Response) {
@@ -16,8 +17,15 @@ class GameController {
         message: 'Game not found',
       });
     }
+
+    const gameInformation = await GameInformation.create({
+      id_game: startedGame._id,
+      lifes: 6,
+    });
+
     return res.json({
-      id: startedGame._id,
+      id: gameInformation._id,
+      lifes: gameInformation.lifes,
       theme: startedGame.theme,
       quantityLetters: startedGame.word.length,
     });
@@ -46,21 +54,44 @@ class GameController {
 
     const { id, letter } = req.body;
     try {
-      const game = await Game.findById(id);
+      const gameInformation = await GameInformation.findById(id);
+      const game = await Game.findById(gameInformation?.id_game);
 
-      if (!game) {
+      if (!game || !gameInformation) {
         return res.status(404).json({
           message: 'Game not found',
         });
       }
       const indexesOfLetters = getIndexesOfLettersByWord(game.word, letter);
 
-      if (!indexesOfLetters) {
-        return res.json({ message: 'Letter not founded' });
+      if (!indexesOfLetters.length) {
+        gameInformation.lifes--;
+        await gameInformation.save();
+        return res.json({
+          message: 'Letter not founded',
+          lifes: gameInformation.lifes,
+          is_winner: gameInformation.is_winner,
+        });
       }
-      return res.json({ indexesOfLetters });
+
+      indexesOfLetters?.forEach(item => {
+        if (gameInformation.letters_indexes?.indexOf(item) === -1) {
+          gameInformation.letters_indexes?.push(item);
+        }
+      });
+
+      if (gameInformation.letters_indexes?.length === game.word.length) {
+        gameInformation.is_winner = true;
+      }
+
+      await gameInformation.save();
+
+      return res.json({
+        indexesOfLetters,
+        lifes: gameInformation.lifes,
+        is_winner: gameInformation.is_winner,
+      });
     } catch (error) {
-      // return res.status(404).json({message: 'Id not founded'});
       return res.status(404).json({ message: error.message });
     }
   }
