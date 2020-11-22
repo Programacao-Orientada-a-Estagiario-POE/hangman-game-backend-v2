@@ -20,14 +20,11 @@ class GameController {
       });
     }
 
-<<<<<<< HEAD
     const gameInformation = await GameInformation.create({
       id_game: startedGame._id,
       lifes: 6,
     });
 
-=======
->>>>>>> 028138428ee3843f11ddce9bc7d6c5b897444c2a
     return res.json({
       id: gameInformation._id,
       lifes: gameInformation.lifes,
